@@ -8,6 +8,7 @@ import requests
 from requests.exceptions import Timeout
 from bs4 import BeautifulSoup
 import argparse
+import re
 
 args = argparse.ArgumentParser(description=__doc__)
 args.add_argument("-u", "--url", help="Address for scanning CMS Bitrix", required=True)
@@ -143,13 +144,7 @@ def reflected_xss2(url):
 if __name__ == '__main__':
     options = args.parse_args()
     user_agent = {'User-agent': 'Mozilla/5.0'}
-    url = str(options.url)
-    if url.find("http://") == 0:
-        url = url.replace("http://", "")
-    if url.find("https://") == 0:
-        url = url.replace("https://", "")
-    if url.find("/") > 0:
-        url = url.replace("/", "")
+    url = re.sub(r'https?://|/.+','',str(options.url))
     try:
         requests.get(f"http://{url}", timeout=5, headers=user_agent)
     except Timeout as e:
